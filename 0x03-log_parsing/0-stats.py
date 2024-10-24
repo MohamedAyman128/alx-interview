@@ -1,43 +1,51 @@
 #!/usr/bin/python3
-"""
-log parsing problem
-"""
-import re
-from sys import stdin
+
+import sys
 
 
-if __name__ == '__main__':
-    state_codes = {200: 0, 301: 0, 400: 0, 401: 0,
-                   403: 0, 404: 0, 405: 0, 500: 0}
+def print_msg(dict_sc, total_file_size):
+    """
+    Method to print
+    Args:
+        dict_sc: dict of status codes
+        total_file_size: total of the file
+    Returns:
+        Nothing
+    """
 
-    def print_codes(codes, total_size):
-        """
-        Print file sizes and status codes.
-        """
-        print(f'File size: {total_size}')
-        for k, v in sorted(codes.items()):
-            if v != 0:
-                print(f'{k}: {v}')
+    print("File size: {}".format(total_file_size))
+    for key, val in dict_sc.items():
+        if val != 0:
+            print("{:s}: {:d}".format(key, val))
 
-    count, filesize = 0, 0
-    lines = []
 
-    try:
-        for line in stdin:
-            count += 1
-            splitted = line.split(' ')
-            try:
-                code = int(splitted[-2])
-                if code in state_codes:
-                    state_codes[code] += 1
-            except BaseException:
-                pass
-            try:
-                filesize += int(splitted[-1])
-            except BaseException:
-                pass
-            if count % 10 == 0:
-                print_codes(state_codes, filesize)
-        print_codes(state_codes, filesize)
-    except BaseException:
-        print_codes(state_codes, filesize)
+total_file_size = 0
+code = 0
+counter = 0
+dict_sc = {
+    "200": 0, "301": 0,
+    "400": 0, "401": 0,
+    "403": 0, "404": 0,
+    "405": 0, "500": 0
+}
+
+try:
+    for line in sys.stdin:
+        parsed_line = line.split()
+
+        if len(parsed_line) > 2:
+            counter += 1
+
+            if counter <= 10:
+                total_file_size += int(parsed_line[-1])
+                code = parsed_line[-2]
+
+                if (code in dict_sc.keys()):
+                    dict_sc[code] += 1
+
+            if (counter == 10):
+                print_msg(dict_sc, total_file_size)
+                counter = 0
+
+finally:
+    print_msg(dict_sc, total_file_size)
